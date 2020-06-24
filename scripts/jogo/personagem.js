@@ -1,19 +1,22 @@
 class Personagem extends Animacao{
   
-  constructor(matriz, imagem, x, largura, altura, larguraS, alturaS, velocidade){
-    super(matriz, imagem, x, largura, altura, larguraS, alturaS);
-    this.velocidade = velocidade;
+  constructor(matriz, imagem, x, variacaoY, largura, altura, larguraS, alturaS, velocidade){
     
-    this.yInicial = height - this.altura;
+    super(matriz, imagem, x, variacaoY, largura, altura, larguraS, alturaS);
+    
+    this.velocidade = velocidade;
+    this.variacaoY = variacaoY;
+
+    this.yInicial = height - this.altura - this.variacaoY;
     this.y = this.yInicial;
     this.velocidadePulo = 0;
-    this.gravidade = 3;
+    this.gravidade = 1;
   }
   
   pula(){
     if(this.y === this.yInicial){
       this.velocidadePulo = -30;
-      somDoPulo.play(); 
+      // somDoPulo.play(); 
     }
   }
   

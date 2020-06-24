@@ -1,41 +1,54 @@
 let imagemCenario;
 let imagemPersonagem;
 let imagemInimigo;
+let imagemInimigoTroll;
+let imagemInimigoVoador;
+let imagemGameOver;
+
+let pontuacao;
+
 let cenario;
+
 let personagem;
+
 let inimigo;
+let inimigoTroll;
+let inimigoVoador;
+
 let somDoJogo;
 let somDoPulo;
 
+const inimigos = [];
+
 const matrizInimigo = [
   [0, 0],
-  [104, 0],
-  [208, 0],
-  [312, 0],
+  [105, 0],
+  [210, 0],
+  [315, 0],
   [0, 104],
-  [104, 104],
-  [208, 104],
-  [312, 104],
+  [105, 104],
+  [210, 104],
+  [315, 104],
   [0, 208],
-  [104, 208],
-  [208, 208],
-  [312, 208],
+  [105, 208],
+  [210, 208],
+  [315, 208],
   [0, 312],
-  [104, 312],
-  [208, 312],
-  [312, 312],
-  [0, 416],
-  [104, 416],
-  [208, 416],
-  [312, 416],
-  [0, 520],
-  [104, 520],
-  [208, 520],
-  [312, 520],
-  [0, 624],
-  [104, 624],
-  [208, 624],
-  [312, 624]
+  [105, 312],
+  [210, 312],
+  [315, 312],
+  [0, 409],
+  [105, 409],
+  [210, 409],
+  [315, 409],
+  [0, 503],
+  [105, 503],
+  [210, 503],
+  [315, 503],
+  [0, 609],
+  [105, 609],
+  [210, 609],
+  [315, 609],
 ]
 
 const matrizPersonagem = [
@@ -57,10 +70,68 @@ const matrizPersonagem = [
   [660, 810],
 ]
 
+const matrizInimigoTroll = [
+  [0,0],
+  [400,0],
+  [800,0],
+  [1200,0],
+  [1600,0],
+  [0,400],
+  [400,400],
+  [800,400],
+  [1200, 400],
+  [1600, 400],
+  [0,800],
+  [400, 800],
+  [800, 800],
+  [1200, 800],
+  [1600, 800],
+  [0, 1200],
+  [400, 1200],
+  [800, 1200],
+  [1200, 1200],
+  [1600, 1200], 
+  [0, 1600],
+  [400, 1600],
+  [800, 1600],
+  [1200, 1600],
+  [1600, 1600],
+  [0, 2000],
+  [400, 2000],
+  [800, 2000],
+]
+
+const matrizInimigoVoador = [
+  [0,0],
+  [200, 0],
+  [400, 0],
+  [0, 150],
+  [200, 150],
+  [400, 150],
+  [0, 300],
+  [200, 300],
+  [400, 300],
+  [0, 450],
+  [200, 450],
+  [400, 450],
+  [0, 600],
+  [200, 600],
+  [400, 600],
+  [0, 750],
+]
+
 function preload(){
   imagemCenario = loadImage('./imagens/cenario/floresta.png');
+  imagemGameOver = loadImage('./imagens/assets/game-over.png');
+  
   imagemPersonagem =   loadImage('./imagens/personagem/correndo.png');
+  
   imagemInimigo = loadImage('./imagens/inimigos/gotinha.png');
+  imagemInimigoTroll = loadImage('./imagens/inimigos/troll.png');
+  imagemInimigoVoador = loadImage('./imagens/inimigos/gotinha-voadora.png');
+  
+  pontuacao = new Pontuacao();
+  
   somDoJogo = loadSound('./sons/trilha_jogo.mp3');
   somDoPulo = loadSound('./sons/jump.flac');
 }
@@ -81,23 +152,55 @@ function setup() {
   personagem = new Personagem(
     matrizPersonagem, 
     imagemPersonagem, 
-    0, 
+    200,
+    30, 
     110, 
     135, 
     220, 
     270,
-    10);
+    10
+  );
   
-  inimigo = new Inimigo(
+  inimigos.push(new Inimigo(
     matrizInimigo, 
     imagemInimigo, 
-    width - 52, 
+    width,
+    30,
     52, 
     52, 
     104, 
-    90,
-    10
-  );
+    104,
+    12,
+    30
+  )); //inimigo -> Gotinha
+
+
+  inimigos.push(new Inimigo(
+    matrizInimigoVoador, 
+    imagemInimigoVoador, 
+    width - 52,
+    200,
+    100, 
+    75, 
+    200, 
+    150,
+    10,
+    2500
+  )); //inimigo -> Voador
+  
+  inimigos.push(new Inimigo(
+    matrizInimigoTroll, 
+    imagemInimigoTroll, 
+    width,
+    28,
+    200,
+    200,
+    400,
+    400,
+    10,
+    1500
+  ));// inimigo -> Troll
+
   frameRate(40);
   
   // console.log(somDoJogo)
@@ -106,13 +209,25 @@ function setup() {
 
 function draw() {
   cenario.exibe();
-  inimigo.exibe();
+  pontuacao.exibe();
+  pontuacao.adicionarPonto();
+
+  inimigos.map(inimigo => {
+    inimigo.exibe();
+    inimigo.move();
+
+    if(personagem.estaColidindo(inimigo)){
+      console.log('Colidiu!');
+
+      image(imagemGameOver, width/2 - 200, height/2 - 200);
+      noLoop();
+    }
+  })
+
   personagem.exibe();
   personagem.aplicaGravidade();
-  inimigo.move();
+  
+  
   cenario.move();
 
-  if(personagem.estaColidindo(inimigo)){
-    console.log('Colidiu!');
-  }
 }
