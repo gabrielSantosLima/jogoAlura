@@ -4,19 +4,23 @@ let imagemInimigo;
 let imagemInimigoTroll;
 let imagemInimigoVoador;
 let imagemGameOver;
+let imagemVida;
 let imagemTelaInicial;
 
 let fonteTelaInicial;
 
 let pontuacao;
+let vida;
 
 let jogo;
 
 let cenario;
 let personagem;
 
+let fita; 
+
 let cenas;
-let cenaAtual = "telaInicial";
+let cenaAtual = "jogo";
 let telaInicial;
 let botao;
 
